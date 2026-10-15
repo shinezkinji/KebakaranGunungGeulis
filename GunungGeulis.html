@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kebakaran Hutan Gunung Geulis - Karya Arya Aprilio (XI TKJ A)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0908;
+            --bg-card: rgba(22, 18, 16, 0.88);
+            --text-main: #e8e2dc;
+            --text-muted: #a89f96;
+            --accent-fire: #ff5500;
+            --accent-amber: #ff9d00;
+            --accent-siren: #0077ff;
+            --border-color: rgba(255, 85, 0, 0.28);
+            --font-size-story: 1.125rem;
+        }
+
+        body.day-mode {
+            --bg-primary: #0f1c18;
+            --bg-card: rgba(20, 38, 32, 0.9);
+            --text-main: #e6f2ed;
+            --text-muted: #9ab8ac;
+            --accent-fire: #2ec4b6;
+            --accent-amber: #80ed99;
+            --border-color: rgba(128, 237, 153, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.8;
+            overflow-x: hidden;
+            transition: background-color 0.8s ease, color 0.5s ease;
+        }
+
+        .cite-hidden {
+            display: none;
+        }
+
+        /* Progress Bar */
+        #progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            z-index: 1000;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-fire), var(--accent-amber), var(--accent-siren));
+            box-shadow: 0 0 12px var(--accent-fire);
+            transition: width 0.1s ease;
+        }
+
+        /* Background Canvas */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Floating Control Bar */
+        .top-controls {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 900;
+            display: flex;
+            gap: 10px;
+            background: rgba(15, 14, 14, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-control {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .btn-control:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--accent-amber);
+        }
+
+        .btn-control.active {
+            background: var(--accent-fire);
+            color: #fff;
+        }
+
+        /* Hero Header */
+        header.hero {
+            position: relative;
+            z-index: 1;
+            min-height: 78vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 1.5rem 3.5rem;
+            background: radial-gradient(circle at 50% 80%, rgba(255, 68, 0, 0.22), transparent 65%);
+        }
+
+        body.day-mode header.hero {
+            background: radial-gradient(circle at 50% 80%, rgba(46, 196, 182, 0.18), transparent 65%);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .location-badge, .author-top-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .location-badge {
+            background: rgba(255, 85, 0, 0.15);
+            border: 1px solid var(--border-color);
+            color: var(--accent-amber);
+        }
+
+        .author-top-badge {
+            background: linear-gradient(135deg, rgba(255, 157, 0, 0.22), rgba(255, 85, 0, 0.25));
+            border: 1px solid var(--accent-amber);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 157, 0, 0.2);
+        }
+
+        h1.story-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            max-width: 850px;
+            margin-bottom: 1rem;
+            background: linear-gradient(180deg, #ffffff 0%, #ffd080 55%, #ff5500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(255, 68, 0, 0.25);
+        }
+
+        body.day-mode h1.story-title {
+            background: linear-gradient(180deg, #ffffff 0%, #b7efc5 60%, #2ec4b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 620px;
+            margin-bottom: 2.2rem;
+        }
+
+        /* Metadata Cards */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+            gap: 14px;
+            width: 100%;
+            max-width: 820px;
+            margin-top: 0.5rem;
+        }
+
+        .meta-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 12px;
+            text-align: left;
+            backdrop-filter: blur(8px);
+        }
+
+        .meta-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Main Story Container */
+        main.container {
+            position: relative;
+            z-index: 1;
+            max-width: 820px;
+            margin: 0 auto 4rem;
+            padding: 0 1.25rem;
+        }
+
+        article.story-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: clamp(1.75rem, 5vw, 3.5rem);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-content p {
+            font-family: 'Lora', serif;
+            font-size: var(--font-size-story);
+            line-height: 1.95;
+            margin-bottom: 1.75rem;
+            text-align: justify;
+            color: var(--text-main);
+        }
+
+        /* Dropcap on First Paragraph */
+        .story-content p.first-para::first-letter {
+            float: left;
+            font-family: 'Cinzel', serif;
+            font-size: 3.8rem;
+            line-height: 0.85;
+            padding-right: 14px;
+            padding-top: 4px;
+            color: var(--accent-amber);
+            font-weight: 800;
+        }
+
+        /* Section Dividers */
+        .chapter-marker {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 2.5rem 0 1.5rem;
+            color: var(--accent-amber);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .chapter-marker::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-color), transparent);
+        }
+
+        /* Highlight Pull Quote */
+        .fire-quote {
+            margin: 2.2rem 0;
+            padding: 1.5rem 1.75rem;
+            border-left: 4px solid var(--accent-fire);
+            background: linear-gradient(90deg, rgba(255, 85, 0, 0.12), transparent);
+            border-radius: 0 12px 12px 0;
+            font-family: 'Lora', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #ffd8be;
+        }
+
+        /* Siren Alert Callout */
+        .siren-banner {
+            margin: 2.2rem 0;
+            padding: 1rem 1.4rem;
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(0, 119, 255, 0.16), rgba(255, 50, 0, 0.16));
+            border: 1px solid rgba(0, 140, 255, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #bfe0ff;
+        }
+
+        .siren-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0088ff;
+            box-shadow: 0 0 12px #0088ff;
+            animation: pulseSiren 1s infinite alternate;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulseSiren {
+            0% { background: #0088ff; box-shadow: 0 0 15px #0088ff; }
+            100% { background: #ff3300; box-shadow: 0 0 15px #ff3300; }
+        }
+
+        /* Cap / Stempel Resmi Pembuat di Akhir Cerita */
+        .author-stamp-section {
+            margin-top: 3.5rem;
+            padding-top: 2rem;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .word-count-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .word-count-info strong {
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+
+        .official-stamp {
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 26px;
+            border: 3px double var(--accent-amber);
+            border-radius: 10px;
+            color: var(--accent-amber);
+            transform: rotate(-3deg);
+            background: rgba(255, 157, 0, 0.06);
+            box-shadow: 0 0 25px rgba(255, 85, 0, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            user-select: none;
+        }
+
+        .official-stamp .stamp-top {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 3px;
+            margin-bottom: 4px;
+            width: 100%;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .official-stamp .stamp-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 157, 0, 0.5);
+        }
+
+        .official-stamp .stamp-class {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--accent-amber);
+            margin-top: 2px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem 4.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-author {
+            margin-top: 6px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .top-controls {
+                top: auto;
+                bottom: 16px;
+                right: 50%;
+                transform: translateX(50%);
+                width: max-content;
+            }
+            .story-content p {
+                text-align: left;
+            }
+            .author-stamp-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .official-stamp {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Indikator Progres Baca -->
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <!-- Kanvas Animasi Partikel Bara Api / Embun -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Panel Kontrol Interaktif -->
+    <div class="top-controls">
+        <button class="btn-control active" id="btn-fire" onclick="setTheme('fire')">🔥 Malam Kebakaran</button>
+        <button class="btn-control" id="btn-day" onclick="setTheme('day')">🌿 Hari Ke-2 (Padam)</button>
+        <button class="btn-control" onclick="changeFontSize(-1)" title="Perkecil Teks">A-</button>
+        <button class="btn-control" onclick="changeFontSize(1)" title="Perbesar Teks">A+</button>
+    </div>
+
+    <!-- Bagian Header / Hero -->
+    <header class="hero">
+        <div class="badge-group">
+            <div class="location-badge">📍 Cuklik, Sumedang, Jawa Barat</div>
+            <div class="author-top-badge">✍️ Karya: Arya Aprilio • XI TKJ A</div>
+        </div>
+        <h1 class="story-title">Kebakaran Hutan Gunung Geulis<span class="cite-hidden">[span_0](start_span)[span_0](end_span)</span></h1>
+        <p class="subtitle">Sebuah kisah keberanian di tengah kepungan bara api, kabut asap, dan semangat gotong royong menjaga hutan desa.<span class="cite-hidden">[span_1](start_span)[span_1](end_span)</span></p>
+
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">Penulis Cerita</span>
+                <span class="meta-value">Arya Aprilio (XI TKJ A)</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Latar Tempat</span>
+                <span class="meta-value">Gunung Geulis, Cuklik<span class="cite-hidden">[span_2](start_span)[span_2](end_span)</span></span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Tokoh Cerita</span>
+                <span class="meta-value">Aku, Ayah (BPD), Warga & Damkar<span class="cite-hidden">[span_3](start_span)[span_3](end_span)</span></span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Panjang Cerita</span>
+                <span class="meta-value" id="meta-word-count">~1.020 Kata (9 Paragraf)</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten Utama Cerpen -->
+    <main class="container">
+        <article class="story-card">
+            <div class="story-content" id="story-body">
+
+                <div class="chapter-marker">01 • Laporan Darurat di Balai Desa</div>
+                <p class="first-para">
+                    Kemarau panjang tahun ini membuat udara malam di kampungku, kawasan Cuklik, Sumedang, Jawa Barat, terasa begitu kering dan gerah.<span class="cite-hidden">[span_4](start_span)[span_4](end_span)</span> Malam itu sekitar pukul delapan, aku sedang duduk belajar di ruang tengah rumah untuk mempersiapkan pelajaran sekolah besok pagi. Sementara itu, ayahku sedang berada di Balai Desa untuk berkoordinasi dengan perangkat desa lainnya. Sebagai anggota <strong>Badan Pengamanan Desa (BPD)</strong>, ayahku memang selalu siaga menjaga keamanan lingkungan, terlebih di musim kemarau yang rawan bencana.<span class="cite-hidden">[span_5](start_span)[span_5](end_span)</span> Tiba-tiba, langkah kaki tergesa-gesa terdengar dari halaman depan dan ayahku masuk ke rumah dengan wajah tegang sambil menggenggam lampu senter serta radio panggil. Dengan napas memburu, ayah menceritakan bahwa beberapa petani sekitar yang baru turun dari lahan garapan datang berlari-lari melapor ke kantor desa karena menemukan kobaran api di perbatasan hutan. Menurut kesaksian para petani tersebut, penyebab kebakaran itu gara-gara ada orang tidak bertanggung jawab yang membakar kayu sembarangan di dalam hutan lalu meninggalkannya begitu saja dalam keadaan masih menyala. Mendapat laporan darurat itu, ayah langsung mengajakku untuk ikut berpatroli ke atas bukit bersama warga guna mengamankan hutan.<span class="cite-hidden">[span_6](start_span)[span_6](end_span)</span>
+                </p>
+
+                <p>
+                    Tanpa berpikir panjang, aku segera menutup buku pelajaranku, mengenakan jaket tebal serta sepatu olahraga, lalu bergegas keluar rumah mengikuti langkah cepat ayahku menuju titik kumpul warga. Malam itu, langit di atas kawasan Cuklik, Sumedang, Jawa Barat tidak berwarna hitam pekat seperti biasanya, melainkan memerah menyala.<span class="cite-hidden">[span_7](start_span)[span_7](end_span)</span> Dari kejauhan, lereng hutan Gunung Geulis tampak seperti sedang dilahap monster api raksasa.<span class="cite-hidden">[span_8](start_span)[span_8](end_span)</span> Udara dingin khas pegunungan mendadak berganti menjadi hawa panas yang menyesakkan dada, bercampur dengan kepulan asap tebal dan bau sangit dedaunan kering yang terbakar.<span class="cite-hidden">[span_9](start_span)[span_9](end_span)</span> Aku berlari menyusuri jalan setapak hutan yang gelap bersama ayahku dan puluhan warga desa.<span class="cite-hidden">[span_10](start_span)[span_10](end_span)</span> Sebagai anggota <strong>Badan Pengamanan Desa (BPD)</strong>, ayahku memikul tanggung jawab besar di garis terdepan untuk mengoordinasi warga agar mengamankan hutan dan menahan laju api supaya tidak merembet turun ke pemukiman.<span class="cite-hidden">[span_11](start_span)[span_11](end_span)</span>
+                </p>
+
+                <div class="chapter-marker">02 • Isu Banaspati vs Akal Sehat</div>
+                <p>
+                    Saat kami sedang mendaki jalur tanah yang curam di tengah hutan, embusan angin malam yang kencang tiba-tiba menerbangkan gumpalan getah pohon pinus dan daun kering yang menyala hingga melayang berputar-putar di atas pucuk pepohonan menyerupai bola api. Melihat kilatan api yang melayang di udara gelap tersebut, beberapa warga di barisan depan mendadak berhenti dan berteriak panik karena mengaku seperti melihat sosok <em>Banaspati</em>. Seketika, suasana menjadi riuh dan pendapat para warga pun terbelah lima puluh banding lima puluh; separuh warga mulai ketakutan dan mengira kebakaran hutan ini adalah ulah mistis <em>Banaspati</em>, sedangkan separuh warga lainnya tetap yakin bahwa bencana ini murni ulah orang yang membakar kayu sembarangan sesuai laporan petani tadi. Aku sendiri sama sekali tidak percaya pada hal-hal mistis semacam itu. Agar warga tidak mundur karena ketakutan yang tidak beralasan, aku memberanikan diri bersuara lantang menjelaskan bahwa bola api itu hanyalah getah pinus terbakar yang terbang terbawa pusaran angin panas, bukan hantu api. Ayahku langsung membenarkan penjelasanku dengan tegas dan memerintahkan seluruh warga untuk kembali fokus bergerak maju.
+                </p>
+
+                <div class="chapter-marker">03 • Maju ke Garis Terdepan</div>
+                <p>
+                    Begitu kami tiba di garis batas kebakaran, suara gemeretak dahan pohon yang patah terbakar terdengar semakin dekat, diperparah oleh tiupan angin malam yang kencang.<span class="cite-hidden">[span_12](start_span)[span_12](end_span)</span> Kami semua hanya membawa peralatan seadanya—potongan dahan pohon berdaun basah, cangkul, sabit, dan ember-ember kecil berisi air.<span class="cite-hidden">[span_13](start_span)[span_13](end_span)</span> Wajah ayahku tampak sangat tegang di bawah sorot lampu senter yang menembus kabut asap.<span class="cite-hidden">[span_14](start_span)[span_14](end_span)</span> Kami sebenarnya sudah menghubungi petugas pemadam kebakaran sejak tadi, namun akses jalan menuju Cuklik yang menanjak dan cukup jauh membuat kedatangan mereka terasa sangat lama.<span class="cite-hidden">[span_15](start_span)[span_15](end_span)</span> Jika kami hanya berdiri diam menunggu bantuan tiba, hutan Gunung Geulis bisa habis terbakar malam ini juga.<span class="cite-hidden">[span_16](start_span)[span_16](end_span)</span> Sayangnya, sengatan hawa panas yang luar biasa serta sisa-sisa keraguan akibat isu <em>Banaspati</em> tadi membuat sebagian warga sempat ragu untuk mendekat ke bibir api.
+                </p>
+
+                <p>
+                    Melihat kobaran api yang semakin membesar dan mulai menjalar liar ke semak belukar di hadapan kami, aku tidak bisa menahan diri lagi.<span class="cite-hidden">[span_17](start_span)[span_17](end_span)</span> Tanpa menunggu aba-aba, aku nekat berlari paling depan mendekati dinding api yang membara itu.<span class="cite-hidden">[span_18](start_span)[span_18](end_span)</span> Rasa takut di hatiku seolah menguap begitu saja, berganti dengan tekad kuat untuk melindungi alam dan desaku.<span class="cite-hidden">[span_19](start_span)[span_19](end_span)</span> Dengan napas terengah-engah dan keringat yang bercucuran, aku memukul-mukulkan pelepah daun basah ke arah lidah api dan mencangkul tanah dengan cepat untuk membuat sekat bakar agar api terputus jalurnya.<span class="cite-hidden">[span_20](start_span)[span_20](end_span)</span>
+                </p>
+
+                <blockquote class="fire-quote">
+                    "Hati-hati! Jangan terlalu dekat ke titik api!" teriak ayahku dengan nada cemas sambil berlari menyusulku.<span class="cite-hidden">[span_21](start_span)[span_21](end_span)</span>
+                </blockquote>
+
+                <p>
+                    Namun, tindakanku yang nekat maju duluan itu justru membakar semangat ayah dan para warga lainnya.<span class="cite-hidden">[span_22](start_span)[span_22](end_span)</span> Rasa gentar di benak warga seketika sirna melihatku yang masih pelajar berani bertaruh nyawa di depan; mereka segera merapat ke posisiku, bahu-membahu mengepung kobaran api terbesar dan memukul mundur si jago merah dengan segala tenaga yang tersisa.<span class="cite-hidden">[span_23](start_span)[span_23](end_span)</span>
+                </p>
+
+                <div class="chapter-marker">04 • Sirine Penyelamat di Tengah Malam</div>
+                <div class="siren-banner">
+                    <span class="siren-dot"></span>
+                    <span><strong>Bantuan Tiba:</strong> Regu Pemadam Kebakaran mencapai kaki bukit Cuklik dan menarik selang bertekanan tinggi ke lereng hutan.<span class="cite-hidden">[span_24](start_span)[span_24](end_span)</span></span>
+                </div>
+
+                <p>
+                    Pertarungan melawan amukan api itu berlangsung sangat sengit hingga larut malam. Saat mataku mulai perih karena asap dan tenaga kami hampir terkuras habis, suara meraung-raung yang sangat kami nanti-nantikan akhirnya terdengar memecah suasana malam.<span class="cite-hidden">[span_25](start_span)[span_25](end_span)</span> Suara sirine mobil pemadam kebakaran menggema dari arah bawah bukit Cuklik, disusul kelap-kelip lampu biru yang menembus gelapnya pepohonan.<span class="cite-hidden">[span_26](start_span)[span_26](end_span)</span> Tak lama kemudian, para petugas pemadam kebakaran berlari sigap ke arah kami sambil menarik selang besar.<span class="cite-hidden">[span_27](start_span)[span_27](end_span)</span> Semprotan air bertekanan tinggi langsung diarahkan tepat ke jantung kobaran api yang sejak tadi kami tahan.<span class="cite-hidden">[span_28](start_span)[span_28](end_span)</span> Aku melangkah mundur perlahan sambil menyeka keringat dan noda jelaga hitam di wajahku.<span class="cite-hidden">[span_29](start_span)[span_29](end_span)</span> Ayah menghampiriku, lalu merangkul bahuku erat-erat dengan tatapan penuh rasa syukur dan bangga.<span class="cite-hidden">[span_30](start_span)[span_30](end_span)</span> Perlahan tapi pasti, kepulan asap putih menggantikan nyala api yang padam.<span class="cite-hidden">[span_31](start_span)[span_31](end_span)</span>
+                </p>
+
+                <div class="chapter-marker">05 • Jaga Malam & Hari Kedua Padam Sepenuhnya</div>
+                <p>
+                    Walaupun kobaran api besar telah berhasil dipadamkan oleh petugas, tugas pengamanan malam itu belum sepenuhnya usai karena bara api di bawah lapisan abu tebal masih rawan menyala kembali jika tertiup angin. Oleh karena itu, ayahku bersama para warga dan sebagian petugas pemadam memutuskan untuk tetap berjaga dan bergadang semalaman di hutan sambil terus mengirim laporan kondisi hutan secara berkala kepada pihak desa. Namun, aku sendiri tidak ikut bergadang semalaman di sana karena besok pagi harus masuk sekolah. Sekitar pukul satu dini hari, ayah menyuruhku pulang lebih dulu bersama warga yang turun mengambil logistik agar aku bisa tidur di rumah.
+                </p>
+
+                <p id="ending-section">
+                    Keesokan harinya, tepat setelah bel pulang sekolah berbunyi, aku segera pulang mengganti seragamku dan kembali mendaki Gunung Geulis untuk membantu ayah serta warga yang masih bertugas di lokasi. Di bawah cahaya matahari siang pada hari kedua itu, kami bersama petugas pemadam kebakaran menyisir lahan yang hangus untuk menyiram sisa-sisa asap sekaligus menemukan bukti tumpukan arang kayu bekas pembakaran liar di pinggir hutan, sehingga seluruh warga akhirnya yakin bahwa kebakaran ini murni ulah orang yang membakar kayu sembarangan dan bukan karena <em>Banaspati</em>. Menjelang sore hari di hari kedua tersebut, seluruh titik bara telah tuntas didinginkan dan api dinyatakan sudah padam sepenuhnya. Pengalaman dua hari itu menjadi kenangan tak terlupakan bagiku, di mana berkat keberanian warga dan kedatangan petugas pemadam kebakaran, hutan Gunung Geulis berhasil diselamatkan.<span class="cite-hidden">[span_32](start_span)[span_32](end_span)</span>
+                </p>
+
+            </div>
+
+            <!-- Bagian Cap / Stempel Karya & Penghitung Kata Otomatis -->
+            <div class="author-stamp-section">
+                <div class="word-count-info">
+                    Status Naskah: <strong>Terverifikasi Lengkap</strong><br>
+                    Total Isi Cerita: <strong id="live-word-counter">1.020 Kata</strong> (9 Paragraf)
+                </div>
+
+                <div class="official-stamp">
+                    <span class="stamp-top">Karya Orisinal</span>
+                    <span class="stamp-name">Arya Aprilio</span>
+                    <span class="stamp-class">Kelas XI TKJ A</span>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <p>Kisah Inspiratif Penyelamatan Hutan • <strong>Gunung Geulis, Cuklik, Sumedang, Jawa Barat</strong><span class="cite-hidden">[span_33](start_span)[span_33](end_span)</span></p>
+        <p class="footer-author">© Karya: Arya Aprilio — XI TKJ A</p>
+    </footer>
+
+    <script>
+        // Hitung jumlah kata naskah otomatis dari paragraf cerita
+        window.addEventListener('DOMContentLoaded', () => {
+            const paragraphs = document.querySelectorAll('#story-body p');
+            let fullText = '';
+            paragraphs.forEach(p => {
+                const clone = p.cloneNode(true);
+                clone.querySelectorAll('.cite-hidden').forEach(el => el.remove());
+                fullText += ' ' + clone.innerText;
+            });
+            const words = fullText.trim().split(/\s+/).filter(Boolean).length;
+            document.getElementById('live-word-counter').textContent = words.toLocaleString('id-ID') + ' Kata';
+            document.getElementById('meta-word-count').textContent = words.toLocaleString('id-ID') + ' Kata (9 Paragraf)';
+        });
+
+        // 1. Indikator Progres Membaca & Transisi Tema Otomatis
+        let manualThemeOverride = false;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+
+            if (!manualThemeOverride) {
+                if (progress > 82) {
+                    applyThemeUI('day');
+                } else {
+                    applyThemeUI('fire');
+                }
+            }
+        });
+
+        function setTheme(mode) {
+            manualThemeOverride = true;
+            applyThemeUI(mode);
+        }
+
+        function applyThemeUI(mode) {
+            const body = document.body;
+            const btnFire = document.getElementById('btn-fire');
+            const btnDay = document.getElementById('btn-day');
+
+            if (mode === 'day') {
+                body.classList.add('day-mode');
+                btnDay.classList.add('active');
+                btnFire.classList.remove('active');
+            } else {
+                body.classList.remove('day-mode');
+                btnFire.classList.add('active');
+                btnDay.classList.remove('active');
+            }
+        }
+
+        // 2. Pengatur Ukuran Font
+        let currentFontSize = 1.125;
+        function changeFontSize(step) {
+            currentFontSize = Math.min(1.5, Math.max(0.95, currentFontSize + step * 0.08));
+            document.documentElement.style.setProperty('--font-size-story', currentFontSize + 'rem');
+        }
+
+        // 3. Animasi Partikel Bara Api & Embun
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 3 + 1;
+                this.speedY = Math.random() * 1.4 + 0.4;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.alpha = Math.random() * 0.75 + 0.2;
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX + Math.sin(this.y * 0.01) * 0.3;
+                if (this.y < -10) {
+                    this.reset();
+                }
+            }
+            draw() {
+                const isDay = document.body.classList.contains('day-mode');
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                if (isDay) {
+                    ctx.fillStyle = `rgba(128, 237, 153, ${this.alpha * 0.5})`;
+                    ctx.shadowColor = '#2ec4b6';
+                } else {
+                    ctx.fillStyle = `rgba(255, ${Math.floor(Math.random() * 120 + 60)}, 0, ${this.alpha})`;
+                    ctx.shadowColor = '#ff4500';
+                }
+                ctx.shadowBlur = 10;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 55; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+</body>
+</html>
